@@ -55,10 +55,10 @@ class App extends Component<Props, State> {
       dirty: false,
       getName: function(beds: Bed[]) {
         if (this.dirty) {
-          return this.name.trim();
+          return this.name;
         }
 
-        return this.name.trim() || `Bed #${beds.indexOf(this) + 1}`;
+        return this.name || `Bed #${beds.indexOf(this) + 1}`;
       },
       name: '',
       sleeps: 1
@@ -154,7 +154,7 @@ class App extends Component<Props, State> {
       return 'Names must be unique';
     }
 
-    const bedNames = beds.map((bed) => bed.getName(beds));
+    const bedNames = beds.map((bed) => bed.getName(beds).trim());
     if (bedNames.length !== new Set<string>(bedNames).size) {
       return 'Bed labels must be unique';
     }
