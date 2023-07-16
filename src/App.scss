@@ -11,19 +11,32 @@
     flex: 1;
     flex-direction: column;
     gap: 10px;
+    width: calc(100% - 60px);
 
     > button {
       font-weight: bold;
       margin: 10px 0;
+
+      &.reset {
+        background: transparent;
+        font-size: 15px;
+        margin: 0;
+        padding: 0;
+      }
     }
 
-    > video {
+    > img {
+      background: #000;
       height: 100%;
       left: 0;
-      object-fit: cover;
+      object-fit: contain;
       position: absolute;
       top: 0;
       width: 100%;
+
+      &.hide {
+        display: none;
+      }
     }
 
     > .heading {
@@ -40,18 +53,41 @@
     }
 
     > .people {
+      align-items: center;
       display: flex;
       flex-direction: column;
+      gap: 5px;
+      width: 100%;
 
       > div {
         align-items: center;
         display: flex;
         gap: 10px;
+        justify-content: center;
+        width: 100%;
+
+        > button {
+          background: transparent;
+          padding: 0;
+        }
       }
     }
 
     > .beds {
-      border-spacing: 12px 0;
+      > tbody > tr {
+        > td > button {
+          background: transparent;
+        }
+
+        > .emoji {
+          font-size: 28px;
+        }
+      }
+    }
+
+    > .error {
+      padding: 0 20px;
+      text-align: center;
     }
 
     > .results {
@@ -64,10 +100,23 @@
       > div {
         align-items: center;
         display: flex;
+        flex: 1;
         flex-direction: column;
+        gap: 5px;
 
-        > ul {
-          padding: 0;
+        > div {
+          align-items: center;
+          display: flex;
+          gap: 10px;
+
+          > .avatar {
+            display: flex;
+
+            > svg {
+              height: 25px;
+              width: 25px;
+            }
+          }
         }
       }
     }

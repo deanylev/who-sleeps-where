@@ -70,11 +70,18 @@ class App extends Component<Props, State> {
     const people = [...this.state.people];
     const name = faker.person.fullName();
     people.push({
-      avatarSvg: avatar(name, {
-        size: 35
-      }),
+      avatarSvg: this.generateAvatar(name),
       name
     });
+    this.setState({
+      people
+    });
+  }
+
+  changePersonAvatar(index: number) {
+    const people = [...this.state.people];
+    const person = people[index];
+    person.avatarSvg = this.generateAvatar(`${person.name}-${Math.random()}`);
     this.setState({
       people
     });
@@ -103,6 +110,18 @@ class App extends Component<Props, State> {
     this.setState({
       deciding: true,
       results
+    }, () => {
+      setTimeout(() => {
+        this.setState({
+          deciding: false
+        });
+      }, 3000);
+    });
+  }
+
+  generateAvatar(seed: string) {
+    return avatar(seed, {
+      size: 35
     });
   }
 
@@ -117,17 +136,17 @@ class App extends Component<Props, State> {
     }
 
     if (this.totalSpots !== people.length) {
-      return 'The number of people does not match the number of spots';
+      return 'Number of people does not match number of spots';
     }
 
     const peopleNames = people.map(({ name }) => name.trim());
     if (peopleNames.length !== new Set<string>(peopleNames).size) {
-      return 'Names of people must be unique';
+      return 'Names must be unique';
     }
 
     const bedNames = beds.map((bed) => bed.getName(beds));
     if (bedNames.length !== new Set<string>(bedNames).size) {
-      return 'Labels of beds must be unique';
+      return 'Bed labels must be unique';
     }
 
     return null;
@@ -165,11 +184,12 @@ class App extends Component<Props, State> {
                 {results.map(({ bed, people }, index) => (
                   <div key={index}>
                     <div className="subHeading">{bed.getName(beds)}</div>
-                    <ul>
-                      {people.map(({ name }) => (
-                        <li>{name}</li>
+                      {people.map(({ avatarSvg, name }) => (
+                        <div>
+                          <div className="avatar" dangerouslySetInnerHTML={{ __html: avatarSvg }}></div>
+                          <div>{name}</div>
+                        </div>
                       ))}
-                    </ul>
                   </div>
                 ))}
               </div>
@@ -181,7 +201,7 @@ class App extends Component<Props, State> {
               <div className="people">
                 {people.map(({ avatarSvg, name }, index) => (
                   <div key={index}>
-                    <div dangerouslySetInnerHTML={{ __html: avatarSvg }}></div>
+                    <button dangerouslySetInnerHTML={{ __html: avatarSvg }} onClick={() => this.changePersonAvatar(index)}></button>
                     <input onChange={(event) => this.setPersonName(index, event.target.value)} placeholder="Name" value={name} />
                     <button onClick={() => this.removePerson(index)}>
                       <img alt="trash icon" src="trash.svg" />
@@ -197,6 +217,7 @@ class App extends Component<Props, State> {
                 <table className="beds">
                   <thead>
                     <tr>
+                      <th></th>
                       <th>Label</th>
                       <th>Sleeps How Many?</th>
                       <th></th>
@@ -205,6 +226,9 @@ class App extends Component<Props, State> {
                   <tbody>
                     {beds.map((bed, index) => (
                       <tr key={index}>
+                        <td className="emoji">
+                          🛏️
+                        </td>
                         <td>
                           <input onChange={(event) => this.setBedProperty(index, 'name', event.target.value)} placeholder="Name" type="text" value={bed.getName(beds)} />
                         </td>
@@ -224,13 +248,12 @@ class App extends Component<Props, State> {
               <button onClick={() => this.addBed()}>
                 <img alt="plus icon" src="plus.svg" />
               </button>
-              <div>{errorMessage}</div>
+              <div className="error">{errorMessage}</div>
               <button disabled={!!errorMessage} onClick={() => this.decide()}>Decide</button>
+              <button className="reset" onClick={() => this.reset()}>Reset</button>
             </>
           )}
-          {deciding && (
-            <video autoPlay={true} onEnded={() => this.setState({ deciding: false })} src="drumroll.mp4" />
-          )}
+          <img alt="drumroll animation" className={deciding ? '' : 'hide'} src="drumroll.gif" />
         </div>
         <div className="footer">
           Made by <a href="https://deanlevinson.com.au" rel="noreferrer" target="_blank">Dean Levinson</a> | <a className="colorSecondary" href="https://github.com/deanylev/who-sleeps-where" rel="noreferrer" target="_blank">Source</a>

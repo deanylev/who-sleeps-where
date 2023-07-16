@@ -27,7 +27,8 @@ button {
   font-size: 20px;
   padding: 5px 10px;
 
-  > img {
+  > img,
+  > svg {
     display: block;
   }
 
@@ -53,12 +54,12 @@ button {
 }
 
 input {
-  border: 0;
-  border-radius: 5px;
+  border: 1px solid #000;
+  border-radius: 25px;
   font-size: 14px;
-  max-width: 200px;
-  padding: 5px;
-  width: 100%;
+  max-width: 300px;
+  padding: 5px 10px;
+  width: calc(100% - 20px);
 }
 
 #root {
