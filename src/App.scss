@@ -1,0 +1,78 @@
+.App {
+  align-items: center;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  > .body {
+    align-items: center;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 10px;
+
+    > button {
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    > video {
+      height: 100%;
+      left: 0;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+
+    > .heading {
+      font-family: 'Hello Sunday';
+      font-size: 50px;
+      padding: 20px 0;
+    }
+
+    > .subHeading,
+    > div > div > .subHeading {
+      font-family: 'Hello Sunday';
+      font-size: 35px;
+    }
+
+    > .people {
+      display: flex;
+      flex-direction: column;
+
+      > div {
+        align-items: center;
+        display: flex;
+        gap: 10px;
+      }
+    }
+
+    > .results {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      justify-content: center;
+      margin-top: 10px;
+
+      > div {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+
+        > ul {
+          padding: 0;
+        }
+      }
+    }
+  }
+
+  > .footer {
+    padding: 20px 0;
+
+    > a {
+      color: #fff;
+    }
+  }
+}
