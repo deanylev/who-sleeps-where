@@ -157,7 +157,9 @@ class App extends Component<Props, State> {
       <div className="App">
         <div className="body">
           <div className="heading">Who Sleeps Where?</div>
-          {results ? (
+          {results ? deciding ? (
+            <></>
+          ) : (
             <>
               <div className="results">
                 {results.map(({ bed, people }, index) => (

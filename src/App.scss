@@ -30,6 +30,7 @@
       font-family: 'Hello Sunday';
       font-size: 50px;
       padding: 20px 0;
+      text-align: center;
     }
 
     > .subHeading,
@@ -47,6 +48,10 @@
         display: flex;
         gap: 10px;
       }
+    }
+
+    > .beds {
+      border-spacing: 12px 0;
     }
 
     > .results {

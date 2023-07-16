@@ -56,8 +56,9 @@ input {
   border: 0;
   border-radius: 5px;
   font-size: 14px;
+  max-width: 200px;
   padding: 5px;
-  width: 200px;
+  width: 100%;
 }
 
 #root {
