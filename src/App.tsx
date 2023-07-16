@@ -26,6 +26,7 @@ interface Props {}
 interface State {
   beds: Bed[];
   deciding: boolean;
+  focusInput: { index: number; type: 'bed' | 'person' } | null;
   people: Person[];
   results: Result[] | null;
 }
@@ -41,6 +42,7 @@ class App extends Component<Props, State> {
     this.state = {
       beds: [],
       deciding: false,
+      focusInput: null,
       people: [],
       results: null
     };
@@ -62,7 +64,11 @@ class App extends Component<Props, State> {
       sleeps: 1
     });
     this.setState({
-      beds
+      beds,
+      focusInput: {
+        index: beds.length - 1,
+        type: 'bed'
+      }
     });
   }
 
@@ -74,6 +80,10 @@ class App extends Component<Props, State> {
       name
     });
     this.setState({
+      focusInput: {
+        index: people.length - 1,
+        type: 'person'
+      },
       people
     });
   }
@@ -152,6 +162,27 @@ class App extends Component<Props, State> {
     return null;
   }
 
+  handleInputRef(type: 'bed' | 'person', index: number, input: HTMLInputElement | null) {
+    if (!input) {
+      return;
+    }
+
+    const { focusInput } = this.state;
+    if (!focusInput) {
+      return;
+    }
+
+    if (type !== focusInput.type || index !== focusInput.index) {
+      return;
+    }
+
+    input.focus();
+    input.select();
+    this.setState({
+      focusInput: null
+    });
+  }
+
   removeBed(index: number) {
     const beds = [...this.state.beds];
     beds.splice(index, 1);
@@ -184,12 +215,14 @@ class App extends Component<Props, State> {
                 {results.map(({ bed, people }, index) => (
                   <div key={index}>
                     <div className="subHeading">{bed.getName(beds)}</div>
+                    <div className="people">
                       {people.map(({ avatarSvg, name }) => (
-                        <div>
+                        <div className="person">
                           <div className="avatar" dangerouslySetInnerHTML={{ __html: avatarSvg }}></div>
-                          <div>{name}</div>
+                          <div className="name">{name}</div>
                         </div>
                       ))}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -202,7 +235,7 @@ class App extends Component<Props, State> {
                 {people.map(({ avatarSvg, name }, index) => (
                   <div key={index}>
                     <button dangerouslySetInnerHTML={{ __html: avatarSvg }} onClick={() => this.changePersonAvatar(index)}></button>
-                    <input onChange={(event) => this.setPersonName(index, event.target.value)} placeholder="Name" value={name} />
+                    <input onChange={(event) => this.setPersonName(index, event.target.value)} placeholder="Name" ref={(input) => this.handleInputRef('person', index, input)} value={name} />
                     <button onClick={() => this.removePerson(index)}>
                       <img alt="trash icon" src="trash.svg" />
                     </button>
@@ -230,7 +263,7 @@ class App extends Component<Props, State> {
                           🛏️
                         </td>
                         <td>
-                          <input onChange={(event) => this.setBedProperty(index, 'name', event.target.value)} placeholder="Name" type="text" value={bed.getName(beds)} />
+                          <input onChange={(event) => this.setBedProperty(index, 'name', event.target.value)} placeholder="Name" ref={(input) => this.handleInputRef('bed', index, input)} type="text" value={bed.getName(beds)} />
                         </td>
                         <td>
                           <input min={0} onChange={(event) => this.setBedProperty(index, 'sleeps', parseInt(event.target.value, 10))} placeholder="Sleeps" type="number" value={bed.sleeps} />

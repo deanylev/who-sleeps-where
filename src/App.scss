@@ -50,6 +50,7 @@
     > div > div > .subHeading {
       font-family: 'Hello Sunday';
       font-size: 35px;
+      white-space: nowrap;
     }
 
     > .people {
@@ -81,6 +82,7 @@
 
         > .emoji {
           font-size: 28px;
+          padding-right: 10px;
         }
       }
     }
@@ -96,6 +98,8 @@
       gap: 40px;
       justify-content: center;
       margin-top: 10px;
+      max-width: 1000px;
+      width: 100%;
 
       > div {
         align-items: center;
@@ -104,17 +108,27 @@
         flex-direction: column;
         gap: 5px;
 
-        > div {
-          align-items: center;
+        > .people {
           display: flex;
-          gap: 10px;
+          flex-direction: column;
+          gap: 5px;
 
-          > .avatar {
+          > div {
+            align-items: center;
             display: flex;
+            gap: 10px;
 
-            > svg {
-              height: 25px;
-              width: 25px;
+            > .avatar {
+              display: flex;
+
+              > svg {
+                height: 25px;
+                width: 25px;
+              }
+            }
+
+            > .name {
+              white-space: nowrap;
             }
           }
         }
