@@ -6,6 +6,7 @@ import avatar from 'animal-avatar-generator';
 
 interface Bed {
   dirty: boolean;
+  readonly emoji: string;
   getName: (beds: Bed[]) => string;
   name: string;
   sleeps: number;
@@ -26,6 +27,7 @@ interface Props {}
 interface State {
   beds: Bed[];
   deciding: boolean;
+  enableDrumroll: boolean;
   focusInput: { index: number; type: 'bed' | 'person' } | null;
   people: Person[];
   results: Result[] | null;
@@ -42,6 +44,7 @@ class App extends Component<Props, State> {
     this.state = {
       beds: [],
       deciding: false,
+      enableDrumroll: localStorage.getItem('enable_drumroll') !== 'false',
       focusInput: null,
       people: [],
       results: null
@@ -53,6 +56,9 @@ class App extends Component<Props, State> {
 
     beds.push({
       dirty: false,
+      get emoji() {
+        return this.name.trim().toLowerCase().match(/couch|sleeper/) ? '🛋️' : '🛏️';
+      },
       getName: function(beds: Bed[]) {
         if (this.dirty) {
           return this.name;
@@ -98,7 +104,7 @@ class App extends Component<Props, State> {
   }
 
   decide() {
-    const { beds, people } = this.state;
+    const { beds, enableDrumroll, people } = this.state;
     const remainingPeople = [...people];
     const results = [];
 
@@ -118,7 +124,7 @@ class App extends Component<Props, State> {
     }
 
     this.setState({
-      deciding: true,
+      deciding: enableDrumroll,
       results
     }, () => {
       setTimeout(() => {
@@ -200,7 +206,7 @@ class App extends Component<Props, State> {
   }
 
   render() {
-    const { beds, deciding, people, results } = this.state;
+    const { beds, deciding, enableDrumroll, people, results } = this.state;
     const errorMessage = this.getErrorMessage();
 
     return (
@@ -214,7 +220,7 @@ class App extends Component<Props, State> {
               <div className="results">
                 {results.map(({ bed, people }, index) => (
                   <div key={index}>
-                    <div className="subHeading">{bed.getName(beds)}</div>
+                    <div className="subHeading">{bed.emoji} {bed.getName(beds)}</div>
                     <div className="people">
                       {people.map(({ avatarSvg, name }) => (
                         <div className="person">
@@ -260,7 +266,7 @@ class App extends Component<Props, State> {
                     {beds.map((bed, index) => (
                       <tr key={index}>
                         <td className="emoji">
-                          🛏️
+                          {bed.emoji}
                         </td>
                         <td>
                           <input onChange={(event) => this.setBedProperty(index, 'name', event.target.value)} placeholder="Name" ref={(input) => this.handleInputRef('bed', index, input)} type="text" value={bed.getName(beds)} />
@@ -284,6 +290,10 @@ class App extends Component<Props, State> {
               <div className="error">{errorMessage}</div>
               <button disabled={!!errorMessage} onClick={() => this.decide()}>Decide</button>
               <button className="reset" onClick={() => this.reset()}>Reset</button>
+              <label>
+                <input checked={enableDrumroll} onChange={(event) => this.setEnableDrumroll(event.target.checked)} type="checkbox" />
+                <span>Enable Drumroll</span>
+              </label>
             </>
           )}
           <img alt="drumroll animation" className={deciding ? '' : 'hide'} src="drumroll.gif" />
@@ -313,6 +323,13 @@ class App extends Component<Props, State> {
     }
     this.setState({
       beds
+    });
+  }
+
+  setEnableDrumroll(enabled: boolean) {
+    localStorage.setItem('enable_drumroll', JSON.stringify(enabled));
+    this.setState({
+      enableDrumroll: enabled
     });
   }
 

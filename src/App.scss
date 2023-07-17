@@ -92,6 +92,17 @@
       text-align: center;
     }
 
+    label {
+      align-items: center;
+      display: flex;
+      gap: 5px;
+      margin-top: 20px;
+
+      > span {
+        flex-shrink: 0;
+      }
+    }
+
     > .results {
       display: flex;
       flex-wrap: wrap;
