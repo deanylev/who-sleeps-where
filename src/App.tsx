@@ -80,7 +80,11 @@ class App extends Component<Props, State> {
 
   addPerson() {
     const people = [...this.state.people];
-    const name = faker.person.fullName();
+    const names = people.map(({ name }) => name);
+    let name: string;
+    do {
+      name = faker.person.fullName();
+    } while (names.includes(name));
     people.push({
       avatarSvg: this.generateAvatar(name),
       name
@@ -123,16 +127,22 @@ class App extends Component<Props, State> {
       results.push(result);
     }
 
-    this.setState({
-      deciding: enableDrumroll,
-      results
-    }, () => {
-      setTimeout(() => {
-        this.setState({
-          deciding: false
-        });
-      }, 3000);
-    });
+    if (enableDrumroll) {
+      this.setState({
+        deciding: true,
+        results
+      }, () => {
+        setTimeout(() => {
+          this.setState({
+            deciding: false
+          });
+        }, 3000);
+      });
+    } else {
+      this.setState({
+        results
+      });
+    }
   }
 
   generateAvatar(seed: string) {
@@ -144,25 +154,25 @@ class App extends Component<Props, State> {
   getErrorMessage() {
     const { beds, people } = this.state;
     if (people.length < 2) {
-      return 'Need at least two people';
+      return 'Add at least two people';
     }
 
     if (beds.length < 2) {
-      return 'Need at least two beds';
+      return 'Add at least two beds';
     }
 
     if (this.totalSpots !== people.length) {
-      return 'Number of people does not match number of spots';
+      return 'Make sure the number of people matches the number of spots';
     }
 
     const peopleNames = people.map(({ name }) => name.trim());
-    if (peopleNames.length !== new Set<string>(peopleNames).size) {
-      return 'Names must be unique';
+    if (peopleNames.length !== new Set(peopleNames).size) {
+      return 'Make sure every name is unique';
     }
 
     const bedNames = beds.map((bed) => bed.getName(beds).trim());
-    if (bedNames.length !== new Set<string>(bedNames).size) {
-      return 'Bed labels must be unique';
+    if (bedNames.length !== new Set(bedNames).size) {
+      return 'Make sure every bed label is unique';
     }
 
     return null;
@@ -206,6 +216,7 @@ class App extends Component<Props, State> {
   }
 
   render() {
+    const { totalSpots } = this;
     const { beds, deciding, enableDrumroll, people, results } = this.state;
     const errorMessage = this.getErrorMessage();
 
@@ -213,89 +224,92 @@ class App extends Component<Props, State> {
       <div className="App">
         <div className="body">
           <div className="heading">Who Sleeps Where?</div>
-          {results ? deciding ? (
-            <></>
-          ) : (
-            <>
-              <div className="results">
-                {results.map(({ bed, people }, index) => (
-                  <div key={index}>
-                    <div className="subHeading">{bed.emoji} {bed.getName(beds)}</div>
-                    <div className="people">
-                      {people.map(({ avatarSvg, name }) => (
-                        <div className="person">
-                          <div className="avatar" dangerouslySetInnerHTML={{ __html: avatarSvg }}></div>
-                          <div className="name">{name}</div>
+          {results
+            ? deciding
+              ? (
+                  <></>
+                ) : (
+                  <>
+                    <div className="results">
+                      {results.map(({ bed, people }, index) => (
+                        <div key={index}>
+                          <div className="subHeading">{bed.emoji} {bed.getName(beds)}</div>
+                          <div className="people">
+                            {people.map(({ avatarSvg, name }) => (
+                              <div className="person">
+                                <div className="avatar" dangerouslySetInnerHTML={{ __html: avatarSvg }}></div>
+                                <div className="name">{name}</div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       ))}
                     </div>
-                  </div>
-                ))}
-              </div>
-              <button onClick={() => this.reset()}>Reset</button>
-            </>
-          ) : (
-            <>
-              <div className="subHeading">Who:</div>
-              <div className="people">
-                {people.map(({ avatarSvg, name }, index) => (
-                  <div key={index}>
-                    <button dangerouslySetInnerHTML={{ __html: avatarSvg }} onClick={() => this.changePersonAvatar(index)}></button>
-                    <input onChange={(event) => this.setPersonName(index, event.target.value)} placeholder="Name" ref={(input) => this.handleInputRef('person', index, input)} value={name} />
-                    <button onClick={() => this.removePerson(index)}>
-                      <img alt="trash icon" src="trash.svg" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <button onClick={() => this.addPerson()}>
-                <img alt="plus icon" src="plus.svg" />
-              </button>
-              <div className="subHeading">Where:</div>
-              {beds.length > 0 && (
-                <table className="beds">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>Label</th>
-                      <th>Sleeps How Many?</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {beds.map((bed, index) => (
-                      <tr key={index}>
-                        <td className="emoji">
-                          {bed.emoji}
-                        </td>
-                        <td>
-                          <input onChange={(event) => this.setBedProperty(index, 'name', event.target.value)} placeholder="Name" ref={(input) => this.handleInputRef('bed', index, input)} type="text" value={bed.getName(beds)} />
-                        </td>
-                        <td>
-                          <input min={0} onChange={(event) => this.setBedProperty(index, 'sleeps', parseInt(event.target.value, 10))} placeholder="Sleeps" type="number" value={bed.sleeps} />
-                        </td>
-                        <td>
-                          <button onClick={() => this.removeBed(index)}>
+                    <button onClick={() => this.reset()}>Reset</button>
+                  </>
+                ) : (
+                  <>
+                    <div className="subHeading">Who ({people.length}):</div>
+                    <div className="people">
+                      {people.map(({ avatarSvg, name }, index) => (
+                        <div key={index}>
+                          <button dangerouslySetInnerHTML={{ __html: avatarSvg }} onClick={() => this.changePersonAvatar(index)}></button>
+                          <input onChange={(event) => this.setPersonName(index, event.target.value)} placeholder="Name" ref={(input) => this.handleInputRef('person', index, input)} value={name} />
+                          <button onClick={() => this.removePerson(index)}>
                             <img alt="trash icon" src="trash.svg" />
                           </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-              <button onClick={() => this.addBed()}>
-                <img alt="plus icon" src="plus.svg" />
-              </button>
-              <div className="error">{errorMessage}</div>
-              <button disabled={!!errorMessage} onClick={() => this.decide()}>Decide</button>
-              <button className="reset" onClick={() => this.reset()}>Reset</button>
-              <label>
-                <input checked={enableDrumroll} onChange={(event) => this.setEnableDrumroll(event.target.checked)} type="checkbox" />
-                <span>Enable Drumroll</span>
-              </label>
-            </>
-          )}
+                        </div>
+                      ))}
+                    </div>
+                    <button onClick={() => this.addPerson()}>
+                      <img alt="plus icon" src="plus.svg" />
+                    </button>
+                    <div className="subHeading">Where ({totalSpots}):</div>
+                    {beds.length > 0 && (
+                      <table className="beds">
+                        <thead>
+                          <tr>
+                            <th></th>
+                            <th>Label</th>
+                            <th>Sleeps How Many?</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {beds.map((bed, index) => (
+                            <tr key={index}>
+                              <td className="emoji">
+                                {bed.emoji}
+                              </td>
+                              <td>
+                                <input onChange={(event) => this.setBedProperty(index, 'name', event.target.value)} placeholder="Name" ref={(input) => this.handleInputRef('bed', index, input)} type="text" value={bed.getName(beds)} />
+                              </td>
+                              <td>
+                                <input min={0} onChange={(event) => this.setBedProperty(index, 'sleeps', parseInt(event.target.value, 10))} placeholder="Sleeps" type="number" value={bed.sleeps} />
+                              </td>
+                              <td>
+                                <button onClick={() => this.removeBed(index)}>
+                                  <img alt="trash icon" src="trash.svg" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                    <button onClick={() => this.addBed()}>
+                      <img alt="plus icon" src="plus.svg" />
+                    </button>
+                    <div className="error">{errorMessage}</div>
+                    <button disabled={!!errorMessage} onClick={() => this.decide()}>Decide</button>
+                    <button className="reset" onClick={() => this.reset()}>Reset</button>
+                    <label>
+                      <input checked={enableDrumroll} onChange={(event) => this.setEnableDrumroll(event.target.checked)} type="checkbox" />
+                      <span>Enable Drumroll</span>
+                    </label>
+                  </>
+                )
+          }
           <img alt="drumroll animation" className={deciding ? '' : 'hide'} src="drumroll.gif" />
         </div>
         <div className="footer">
