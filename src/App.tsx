@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { ChangeEvent, Component } from 'react';
 import './App.scss';
 
 import { faker } from '@faker-js/faker';
@@ -35,7 +35,7 @@ interface State {
 
 class App extends Component<Props, State> {
   get totalSpots() {
-    return this.state.beds.reduce((a, b) => a + b.sleeps, 0);
+    return this.state.beds.reduce((a, b) => a + (b.sleeps || 1), 0);
   }
 
   constructor(props: Props) {
@@ -285,7 +285,7 @@ class App extends Component<Props, State> {
                                 <input onChange={(event) => this.setBedProperty(index, 'name', event.target.value)} placeholder="Name" ref={(input) => this.handleInputRef('bed', index, input)} type="text" value={bed.getName(beds)} />
                               </td>
                               <td>
-                                <input min={0} onChange={(event) => this.setBedProperty(index, 'sleeps', parseInt(event.target.value, 10))} placeholder="Sleeps" type="number" value={bed.sleeps} />
+                                <input min={0} onBlur={(event) => this.setBedSleeps(index, event, true)} onChange={(event) => this.setBedSleeps(index, event)} placeholder="Sleeps" type="number" value={bed.sleeps} />
                               </td>
                               <td>
                                 <button onClick={() => this.removeBed(index)}>
@@ -325,6 +325,14 @@ class App extends Component<Props, State> {
       people: [],
       results: null
     });
+  }
+
+  setBedSleeps(index: number, event: ChangeEvent<HTMLInputElement>, fallback = false) {
+    let value = parseInt(event.target.value, 10);
+    if (fallback) {
+      value = value || 1;
+    }
+    this.setBedProperty(index, 'sleeps', value);
   }
 
   setBedProperty<T extends keyof Bed>(index: number, key: T, value: Bed[T]) {
