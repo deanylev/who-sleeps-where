@@ -59,7 +59,7 @@ class App extends Component<Props, State> {
       get emoji() {
         return this.name.trim().toLowerCase().match(/couch|sleeper/) ? '🛋️' : '🛏️';
       },
-      getName: function(beds: Bed[]) {
+      getName(beds: Bed[]) {
         if (this.dirty) {
           return this.name;
         }
@@ -147,7 +147,7 @@ class App extends Component<Props, State> {
 
   generateAvatar(seed: string) {
     return avatar(seed, {
-      size: 35
+      size: 28
     });
   }
 
@@ -236,7 +236,7 @@ class App extends Component<Props, State> {
                           <div className="subHeading">{bed.emoji} {bed.getName(beds)}</div>
                           <div className="people">
                             {people.map(({ avatarSvg, name }) => (
-                              <div className="person">
+                              <div>
                                 <div className="avatar" dangerouslySetInnerHTML={{ __html: avatarSvg }}></div>
                                 <div className="name">{name}</div>
                               </div>
@@ -266,36 +266,28 @@ class App extends Component<Props, State> {
                     </button>
                     <div className="subHeading">Where ({totalSpots}):</div>
                     {beds.length > 0 && (
-                      <table className="beds">
-                        <thead>
-                          <tr>
-                            <th></th>
-                            <th>Label</th>
-                            <th>Sleeps How Many?</th>
-                            <th></th>
-                          </tr>
-                        </thead>
-                        <tbody>
+                      <>
+                        <div className="bedsHeadings">
+                          <div className="spacer"></div>
+                          <div>Label</div>
+                          <div>Sleeps #</div>
+                          <div className="spacer"></div>
+                        </div>
+                        <div className="beds">
                           {beds.map((bed, index) => (
-                            <tr key={index}>
-                              <td className="emoji">
+                            <div key={index}>
+                              <div className="emoji">
                                 {bed.emoji}
-                              </td>
-                              <td>
-                                <input onChange={(event) => this.setBedProperty(index, 'name', event.target.value)} placeholder="Name" ref={(input) => this.handleInputRef('bed', index, input)} type="text" value={bed.getName(beds)} />
-                              </td>
-                              <td>
-                                <input min={0} onBlur={(event) => this.setBedSleeps(index, event, true)} onChange={(event) => this.setBedSleeps(index, event)} placeholder="Sleeps" type="number" value={bed.sleeps} />
-                              </td>
-                              <td>
-                                <button onClick={() => this.removeBed(index)}>
-                                  <img alt="trash icon" src="trash.svg" />
-                                </button>
-                              </td>
-                            </tr>
+                              </div>
+                              <input onChange={(event) => this.setBedProperty(index, 'name', event.target.value)} placeholder="Name" ref={(input) => this.handleInputRef('bed', index, input)} type="text" value={bed.getName(beds)} />
+                              <input min={0} onBlur={(event) => this.setBedSleeps(index, event, true)} onChange={(event) => this.setBedSleeps(index, event)} placeholder="Sleeps" type="number" value={bed.sleeps} />
+                              <button onClick={() => this.removeBed(index)}>
+                                <img alt="trash icon" src="trash.svg" />
+                              </button>
+                            </div>
                           ))}
-                        </tbody>
-                      </table>
+                        </div>
+                      </>
                     )}
                     <button onClick={() => this.addBed()}>
                       <img alt="plus icon" src="plus.svg" />
@@ -349,7 +341,7 @@ class App extends Component<Props, State> {
   }
 
   setEnableDrumroll(enabled: boolean) {
-    localStorage.setItem('enable_drumroll', JSON.stringify(enabled));
+    localStorage.setItem('enable_drumroll', enabled ? 'true' : 'false');
     this.setState({
       enableDrumroll: enabled
     });
