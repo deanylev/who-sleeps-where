@@ -1,3 +1,5 @@
+$innerWidth: 520px;
+
 .App {
   align-items: center;
   color: #fff;
@@ -16,7 +18,11 @@
 
     > button {
       font-weight: bold;
-      margin: 10px 0;
+      margin: 10px 0 0;
+
+      &.bottomMargin {
+        margin-bottom: 10px;
+      }
 
       &.reset {
         background: transparent;
@@ -59,8 +65,12 @@
       display: flex;
       flex-direction: column;
       gap: 5px;
-      max-width: 420px;
+      max-width: $innerWidth;
       width: 100%;
+
+      &:not(:empty) {
+        margin-bottom: 20px;
+      }
 
       > div {
         align-items: center;
@@ -71,69 +81,81 @@
 
         > button {
           background: transparent;
+          display: flex;
+          flex: 1;
+          justify-content: center;
           padding: 0;
         }
-      }
-    }
 
-    > .bedsHeadings {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      max-width: 420px;
-      width: 100%;
-
-      > div {
-        font-weight: bold;
-        gap: 10px;
-        width: 100%;
-
-        &:not(.spacer) {
-          padding-left: 10px;
-        }
-
-        &.spacer {
-          flex-shrink: 0;
-
-          &:first-child {
-            width: 38px;
-          }
-
-          &:last-child {
-            width: 20px;
-          }
+        > input {
+          flex: 8;
         }
       }
     }
 
     > .beds {
-      max-width: 420px;
+      max-width: $innerWidth;
       width: 100%;
 
-      > div {
+      > .header {
+        display: flex;
+        font-weight: bold;
+        gap: 10px;
+        padding-bottom: 5px;
+
+        > div:not(.spacer) {
+          flex: 2;
+          white-space: nowrap;
+
+          &.wide {
+            flex: 6;
+          }
+        }
+
+        > .spacer {
+          flex: 1;
+        }
+      }
+
+      > .bed {
         align-items: center;
         display: flex;
         gap: 10px;
 
         > .emoji {
+          flex: 1;
           font-size: 28px;
-          padding-right: 10px;
+          text-align: center;
         }
 
         > input {
           height: fit-content;
+
+          &:nth-of-type(1) {
+            flex: 6;
+          }
+
+          &:nth-of-type(2) {
+            flex: 2;
+          }
         }
 
         > button {
           background: transparent;
+          display: flex;
+          flex: 1;
+          justify-content: center;
           padding: 0;
         }
       }
     }
 
     > .error {
-      padding: 0 20px;
       text-align: center;
+
+      &:not(:empty) {
+        padding: 20px 0 10px;
+      }
     }
 
     label {

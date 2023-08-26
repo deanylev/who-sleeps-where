@@ -4,10 +4,11 @@ import './App.scss';
 import { faker } from '@faker-js/faker';
 import avatar from 'animal-avatar-generator';
 
+import bedNames from './bed-names.json';
+
 interface Bed {
   dirty: boolean;
   readonly emoji: string;
-  getName: (beds: Bed[]) => string;
   name: string;
   sleeps: number;
 }
@@ -53,20 +54,17 @@ class App extends Component<Props, State> {
 
   addBed() {
     const beds = [...this.state.beds];
-
+    const names = beds.map(({ name }) => name);
+    let name: string;
+    do {
+      name = bedNames[Math.floor(Math.random() * bedNames.length)];
+    } while (names.includes(name));
     beds.push({
       dirty: false,
       get emoji() {
         return this.name.trim().toLowerCase().match(/couch|sleeper/) ? '🛋️' : '🛏️';
       },
-      getName(beds: Bed[]) {
-        if (this.dirty) {
-          return this.name;
-        }
-
-        return this.name || `Bed #${beds.indexOf(this) + 1}`;
-      },
-      name: '',
+      name,
       sleeps: 1
     });
     this.setState({
@@ -170,7 +168,7 @@ class App extends Component<Props, State> {
       return 'Make sure every name is unique';
     }
 
-    const bedNames = beds.map((bed) => bed.getName(beds).trim());
+    const bedNames = beds.map((bed) => bed.name.trim());
     if (bedNames.length !== new Set(bedNames).size) {
       return 'Make sure every bed label is unique';
     }
@@ -233,7 +231,7 @@ class App extends Component<Props, State> {
                     <div className="results">
                       {results.map(({ bed, people }, index) => (
                         <div key={index}>
-                          <div className="subHeading">{bed.emoji} {bed.getName(beds)}</div>
+                          <div className="subHeading">{bed.emoji} {bed.name}</div>
                           <div className="people">
                             {people.map(({ avatarSvg, name }) => (
                               <div>
@@ -250,6 +248,9 @@ class App extends Component<Props, State> {
                 ) : (
                   <>
                     <div className="subHeading">Who ({people.length}):</div>
+                    <button className="bottomMargin" onClick={() => this.addPerson()}>
+                      <img alt="plus icon" src="plus.svg" />
+                    </button>
                     <div className="people">
                       {people.map(({ avatarSvg, name }, index) => (
                         <div key={index}>
@@ -261,39 +262,34 @@ class App extends Component<Props, State> {
                         </div>
                       ))}
                     </div>
-                    <button onClick={() => this.addPerson()}>
+                    <div className="subHeading">Where ({totalSpots}):</div>
+                    <button className={beds.length === 0 ? 'bottomMargin' : ''} disabled={beds.length === 100} onClick={() => this.addBed()}>
                       <img alt="plus icon" src="plus.svg" />
                     </button>
-                    <div className="subHeading">Where ({totalSpots}):</div>
                     {beds.length > 0 && (
-                      <>
-                        <div className="bedsHeadings">
+                      <div className="beds">
+                        <div className="header">
                           <div className="spacer"></div>
-                          <div>Label</div>
+                          <div className="wide">Label</div>
                           <div>Sleeps #</div>
                           <div className="spacer"></div>
                         </div>
-                        <div className="beds">
-                          {beds.map((bed, index) => (
-                            <div key={index}>
-                              <div className="emoji">
-                                {bed.emoji}
-                              </div>
-                              <input onChange={(event) => this.setBedProperty(index, 'name', event.target.value)} placeholder="Name" ref={(input) => this.handleInputRef('bed', index, input)} type="text" value={bed.getName(beds)} />
-                              <input min={0} onBlur={(event) => this.setBedSleeps(index, event, true)} onChange={(event) => this.setBedSleeps(index, event)} placeholder="Sleeps" type="number" value={bed.sleeps} />
-                              <button onClick={() => this.removeBed(index)}>
-                                <img alt="trash icon" src="trash.svg" />
-                              </button>
+                        {beds.map((bed, index) => (
+                          <div className="bed" key={index}>
+                            <div className="emoji">
+                              {bed.emoji}
                             </div>
-                          ))}
-                        </div>
-                      </>
+                            <input onChange={(event) => this.setBedProperty(index, 'name', event.target.value)} placeholder="Name" ref={(input) => this.handleInputRef('bed', index, input)} type="text" value={bed.name} />
+                            <input min={0} onBlur={(event) => this.setBedSleeps(index, event, true)} onChange={(event) => this.setBedSleeps(index, event)} placeholder="Sleeps" type="number" value={bed.sleeps} />
+                            <button onClick={() => this.removeBed(index)}>
+                              <img alt="trash icon" src="trash.svg" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     )}
-                    <button onClick={() => this.addBed()}>
-                      <img alt="plus icon" src="plus.svg" />
-                    </button>
                     <div className="error">{errorMessage}</div>
-                    <button disabled={!!errorMessage} onClick={() => this.decide()}>Decide</button>
+                    <button className="bottomMargin" disabled={!!errorMessage} onClick={() => this.decide()}>Decide</button>
                     <button className="reset" onClick={() => this.reset()}>Reset</button>
                     <label>
                       <input checked={enableDrumroll} onChange={(event) => this.setEnableDrumroll(event.target.checked)} type="checkbox" />
