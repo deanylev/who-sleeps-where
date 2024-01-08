@@ -164,6 +164,10 @@ $innerWidth: 520px;
       gap: 5px;
       margin-top: 20px;
 
+      > input {
+        width: unset;
+      }
+
       > span {
         flex-shrink: 0;
       }
